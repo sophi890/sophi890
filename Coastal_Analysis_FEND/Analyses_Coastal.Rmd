@@ -1,0 +1,74 @@
+---
+title: "Coastal Analysis"
+output: pdf_document
+---
+
+```{r,echo=FALSE,message=FALSE,warning=FALSE}
+# Set so that long lines in R will be wrapped:
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
+```
+
+## Read in data
+```{r}
+library("readxl")
+library("lme4")
+
+#Read in dataset with coastal coding. Read in summary sheet (sheet 13)
+coastal <- read_excel("FIPS-based datasets_05232021.xlsx", sheet = 13)
+#summary(coastal)
+
+#Read in PM25 data from our 2020 study, created with: PM25 = data.frame(fips = aggregate_pm_census_cdc_test_beds$fips, mean_pm25 = aggregate_pm_census_cdc_test_beds$mean_pm25)
+  #save(PM25, file = 'PM25.Rda')
+load('PM25.Rda')
+```
+
+## Create smaller dataset from previous dataset, dataclean, merge with PM25 dataset.
+```{r}
+coastal.new = data.frame(coastal$`FIPS as Text`, coastal$state, coastal$cases, coastal$deaths, coastal$`Country REGION`, coastal$`Coastal Distance`, coastal$`Population 2019 Estimate`, coastal$`Population Density`, coastal$`All Ages in Poverty (%)`, coastal$`Under 18s in Poverty`, coastal$`Median Income`, coastal$`percent adult obesity`, coastal$`diff/total`, coastal$`Politcal alignment 2020 election`, coastal$`median age 2019`, coastal$Humid)
+colnames(coastal.new) = c('fips', 'state', 'cases', 'deaths', 'region', 'coastal.distance', 'population2019', 'popdensity', 'poverty', 'under18poverty', 'median_income', 'pct_obesity', 'voter_margin_2020', 'party', 'median_age', 'humidity')
+
+#change NAs in coastal.distance to level 4, and save as factor with reference level 4.
+coastal.new$coastal.distance[is.na(coastal.new$coastal.distance)] <- 4
+coastal.new$coastal.distance = as.factor(coastal.new$coastal.distance)
+coastal.new <- within(coastal.new, coastal.distance <- relevel(coastal.distance, ref = 4))
+
+#change NAs in 'region' to 'Inland', convert all characters to lowercase
+coastal.new$region[is.na(coastal.new$region)] <- 'Inland'
+coastal.new$region = tolower(coastal.new$region)
+
+#Merge with PM25 dataset
+coastal.new = merge(coastal.new, PM25, by = 'fips')
+summary(coastal.new)
+```
+\newpage
+## PRELIMINARY ANALYSIS on only coastal counties
+```{r}
+# Subset coastal counties only
+coastal.only = coastal.new[coastal.new$coastal.distance != 4,]
+nrow(coastal.only)
+nrow(na.omit(coastal.only))
+
+# Model cases
+model.initial.cases = glmer(cases ~ (1|state) + coastal.distance + offset(log(population2019)) + scale(popdensity) + scale(poverty) + scale(log(median_income)) + scale(pct_obesity) + scale(voter_margin_2020) + scale(median_age) + factor(party) + factor(humidity) + mean_pm25, family = poisson(link = "log"), data = coastal.only)
+summary(model.initial.cases)
+
+# Model deaths
+model.initial.deaths = glmer(deaths ~ (1|state) + coastal.distance + offset(log(population2019)) + scale(popdensity) + scale(poverty) + scale(log(median_income)) + scale(pct_obesity) + scale(voter_margin_2020) + scale(median_age) + factor(party) + factor(humidity) + mean_pm25, family = poisson(link = "log"), data = coastal.only)
+summary(model.initial.deaths)
+```
+
+\newpage
+## Redo: Create indicator for being a coast (levels 1,2,3) instead. 
+```{r}
+# Indicator Coastal or NonCoastal
+coastal.new$indicatorcoast = ifelse(coastal.new$coastal.distance == '4', 'Noncoastal', 'Coastal')
+
+# Model cases
+model.indicator.cases = glmer(cases ~ (1|state) + factor(indicatorcoast) + offset(log(population2019)) + scale(popdensity) + scale(poverty) + scale(log(median_income)) + scale(pct_obesity) + scale(voter_margin_2020) + scale(median_age) + factor(party) + factor(humidity) + mean_pm25, family = poisson(link = "log"), data = coastal.new)
+summary(model.indicator.cases)
+
+# Model deaths
+model.indicator.deaths = glmer(deaths ~ (1|state) + factor(indicatorcoast) + offset(log(population2019)) + scale(popdensity) + scale(poverty) + scale(log(median_income)) + scale(pct_obesity) + scale(voter_margin_2020) + scale(median_age) + factor(party) + factor(humidity) + mean_pm25, family = poisson(link = "log"), data = coastal.new)
+summary(model.indicator.deaths)
+```
+
