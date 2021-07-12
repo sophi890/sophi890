@@ -1,6 +1,6 @@
 - 👋 Hi, I’m Sophie Woodward.
 - 👀 I’m interested in the application of statistics to epidemiology.
-- 🌱 I’m currently learning statistics and math at Harvard College.
+- 🌱 I’m currently learning statistics and math in my fourth year at Harvard College.
 - 📫 How to reach me: swoodward@college.harvard.edu
 
 <!---
