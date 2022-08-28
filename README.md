@@ -1,7 +1,7 @@
 - 👋 Hi, I’m Sophie Woodward.
-- 👀 I’m interested in the application of statistics to epidemiology.
-- 🌱 I’m currently learning statistics and math in my fourth year at Harvard College.
-- 📫 How to reach me: swoodward@college.harvard.edu
+- 👀 I’m interested in the application of statistics to environmental health and epidemiology.
+- 🌱 I’m currently working towards a PhD in Biostatistics at Harvard T.H. Chan School of Public Health.
+- 📫 How to reach me: swoodward@g.harvard.edu
 
 <!---
 sophi890/sophi890 is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
