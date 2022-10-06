@@ -1,6 +1,6 @@
 - 👋 Hi, I’m Sophie Woodward.
 - 👀 I’m interested in the application of statistics to environmental health and epidemiology.
-- 🌱 I’m currently working towards a PhD in Biostatistics at Harvard T.H. Chan School of Public Health.
+- 🌱 I’m currently a first year PhD student in Biostatistics at Harvard T.H. Chan School of Public Health.
 - 📫 How to reach me: swoodward@g.harvard.edu
 
 <!---
